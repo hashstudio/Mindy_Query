@@ -90,11 +90,7 @@ trait Lookup
      */
     public function buildLte($field, $value)
     {
-
-        $this->buildLg($field, $value, '<=');
-        /* @var $this \Mindy\Query\QueryBuilder */
-        $paramName = $this->makeParamKey($field);
-        return [['and', $this->db->quoteColumnName($field) . ' <= :' . $paramName], [':' . $paramName => $value]];
+        return $this->buildLg($field, $value, '<=');
     }
 
     /**
@@ -104,7 +100,7 @@ trait Lookup
      */
     public function buildLt($field, $value)
     {
-        $this->buildLg($field, $value, '<');
+        return $this->buildLg($field, $value, '<');
     }
 
     /**
@@ -114,7 +110,7 @@ trait Lookup
      */
     public function buildGte($field, $value)
     {
-        $this->buildLg($field, $value, '>=');
+        return $this->buildLg($field, $value, '>=');
     }
 
     /**
@@ -124,14 +120,14 @@ trait Lookup
      */
     public function buildGt($field, $value)
     {
-        $this->buildLg($field, $value, '>');
+        return $this->buildLg($field, $value, '>');
     }
 
     public function buildLg($field, $value, $condition = '<')
     {
         /* @var $this \Mindy\Query\QueryBuilder */
         if ($value instanceof Expression) {
-            return [['and', $this->db->quoteColumnName($field) . " {$condition} " . $value->expression], $value->params];
+            return [['and', $this->db->quoteColumnName($field) . " {$condition} " . $value->expression], $value->params ?: []];
         } else {
             $paramName = $this->makeParamKey($field);
             return [['and', $this->db->quoteColumnName($field) . " {$condition} :" . $paramName], [':' . $paramName => $value]];

@@ -2,7 +2,7 @@
     "name": "hindy/query",
     "homepage": "https://github.com/hahstudio/Mindy_Query",
     "license": "MIT",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "autoload": {
         "psr-4": {
             "Mindy\\Query\\": "src/Mindy/Query"
