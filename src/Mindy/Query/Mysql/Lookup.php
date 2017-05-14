@@ -14,6 +14,8 @@
 
 namespace Mindy\Query\Mysql;
 
+use Mindy\Query\Expression;
+
 trait Lookup
 {
     public $dateFormat = "Y-m-d";
@@ -88,6 +90,8 @@ trait Lookup
      */
     public function buildLte($field, $value)
     {
+
+        $this->buildLg($field, $value, '<=');
         /* @var $this \Mindy\Query\QueryBuilder */
         $paramName = $this->makeParamKey($field);
         return [['and', $this->db->quoteColumnName($field) . ' <= :' . $paramName], [':' . $paramName => $value]];
@@ -100,9 +104,39 @@ trait Lookup
      */
     public function buildLt($field, $value)
     {
+        $this->buildLg($field, $value, '<');
+    }
+
+    /**
+     * @param $field
+     * @param $value
+     * @return array
+     */
+    public function buildGte($field, $value)
+    {
+        $this->buildLg($field, $value, '>=');
+    }
+
+    /**
+     * @param $field
+     * @param $value
+     * @return array
+     */
+    public function buildGt($field, $value)
+    {
+        $this->buildLg($field, $value, '>');
+    }
+
+    public function buildLg($field, $value, $condition = '<')
+    {
         /* @var $this \Mindy\Query\QueryBuilder */
-        $paramName = $this->makeParamKey($field);
-        return [['and', $this->db->quoteColumnName($field) . ' < :' . $paramName], [':' . $paramName => $value]];
+        if ($value instanceof Expression) {
+            return [['and', $this->db->quoteColumnName($field) . " {$condition} " . $value->expression], $value->params];
+        } else {
+            $paramName = $this->makeParamKey($field);
+            return [['and', $this->db->quoteColumnName($field) . " {$condition} :" . $paramName], [':' . $paramName => $value]];
+        }
+
     }
 
     /**
@@ -151,30 +185,6 @@ trait Lookup
         } else {
             return [['in', $field, $value], []];
         }
-    }
-
-    /**
-     * @param $field
-     * @param $value
-     * @return array
-     */
-    public function buildGte($field, $value)
-    {
-        /* @var $this \Mindy\Query\QueryBuilder */
-        $paramName = $this->makeParamKey($field);
-        return [['and', $this->db->quoteColumnName($field) . ' >= :' . $paramName], [':' . $paramName => $value]];
-    }
-
-    /**
-     * @param $field
-     * @param $value
-     * @return array
-     */
-    public function buildGt($field, $value)
-    {
-        /* @var $this \Mindy\Query\QueryBuilder */
-        $paramName = $this->makeParamKey($field);
-        return [['and', $this->db->quoteColumnName($field) . ' > :' . $paramName], [':' . $paramName => $value]];
     }
 
     /**
